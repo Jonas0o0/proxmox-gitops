@@ -97,13 +97,12 @@ resource "proxmox_virtual_environment_firewall_rules" "pve1" {
   }
 
   rule {
-    type   = "in"
-    action = "ACCEPT"
-    # par exemple c'est une plage d'ip 4g
-    source = "80.0.0.0/0"
-    dport  = "51820"
-    proto  = "udp"
-    log    = "info"
+    type    = "in"
+    action  = "ACCEPT" 
+    source  = "0.0.0.0/0"
+    dport   = "51820"
+    proto   = "udp"
+    log     = "info"
 
     # l'authentification wireguard est toujours conditionnée à un échange clé publique / privée + udp
     # l'idée c'est d'autoriser si possible le moins de source d'ip possible quand même, donc si possible savoir à l'avance l'ip publique de là ou on va (ou alors par exemple whitelist les réseaux 4G)
