@@ -9,7 +9,7 @@ Ils sont [décrits dans le dossier terraform](terraform/environments/production/
 
 ![Sous-réseau pubvnet1](assets/infra/pubvnet1.png)
 
-`prvvnet1` désigne tous les services d'administration du PVE (exemple : OpenBao, monitoring Prometheus/Loki/Grafana, Authentik, runners Git...).
+`prvvnet1` désigne tous les services d'administration du PVE (exemple : monitoring Prometheus/Loki/Grafana, Authentik, runners Git...).
 `pubvnet1` désigne tous les services qui seront exposés sur internet public (exemple : Kanboard, n'importe quel projet hébergé comme OpenLaTeX).
 
 Lorsque le SDN est créé, il expose des Linux bridge qui sont directement exploitables avec le SNAT configuré (permet au sous-réseau de sortir sur internet en prenant l'adresse de l'hôte proxmox)

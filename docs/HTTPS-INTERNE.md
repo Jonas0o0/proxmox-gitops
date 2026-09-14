@@ -39,9 +39,9 @@ Nous utilisons alors la logique de [DNS cloudflare](https://github.com/caddy-dns
 
 ## Au déploiement
 
-Ensuite il faudra le rentrer dans openbao avec [le script](../helper-scripts/create_arbitrary_vault_secrets.sh) au chemin `caddy` et à la clé `CLOUDFLARE_API_TOKEN`
+Ensuite il faut le mettre dans les secrets SOPS de Caddy (`services/caddy/secrets.enc.yml`) à la clé `CLOUDFLARE_API_TOKEN`.
 
-En appelant le playbook universel "deploy any compose" avec l'hote et service Caddy, le playbook va obtenir le secret correspondant au service caddy dans Vault / OpenBao et l'injecter dans le [.env.j2](../services/caddy/.env.j2)
+En appelant le playbook universel "deploy any compose" avec l'hote et service Caddy, le playbook va charger le secret SOPS de Caddy et l'injecter dans le [.env.j2](../services/caddy/.env.j2)
 
 Ce fichier est templaté, copié sur le remote et caddy est relancé
 
