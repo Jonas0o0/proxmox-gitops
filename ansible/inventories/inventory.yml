@@ -10,8 +10,6 @@
         ansible_host: 192.168.10.13
       monitoring:
         ansible_host: 192.168.10.14
-      vault:
-        ansible_host: 192.168.10.15
       terraform-backend:
         ansible_host: 192.168.10.18
       komodo:

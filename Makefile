@@ -3,9 +3,6 @@ TF_DIR := terraform/environments/production
 ANSIBLE_INVENTORIES := ansible/inventories
 
 ANSIBLE_INVENTORY := ansible/inventories/inventory.yml
-VAULT_MOUNT ?= secret
-VAULT_PATH ?= settings.yml
-VAULT_KEY ?= RANDOMVAL
 
 # qq exemples : 
 # make tf TF_LAYER=core ACTION=plan
@@ -53,15 +50,5 @@ deploy-alloy:
 deploy-lxc: 
 	ANSIBLE_STRICT_HOST_KEY_CHECKING=false ansible-playbook ansible/playbooks/bootstrap.yml -i $(ANSIBLE_INVENTORIES)/lxc_inventory.yml $(EXTRA_ARGS)
 
-input-vault:
-	@if bao kv get -mount=$(VAULT_MOUNT) $(VAULT_PATH) >/dev/null 2>&1; then \
-		bao kv patch -mount=$(VAULT_MOUNT) $(VAULT_PATH) $(VAULT_KEY)="$(VAULT_VALUE)"; \
-	else \
-		bao kv put -mount=$(VAULT_MOUNT) $(VAULT_PATH) $(VAULT_KEY)="$(VAULT_VALUE)"; \
-	fi
-
-input-random-vault:
-	$(MAKE) input-vault VAULT_MOUNT="$(VAULT_MOUNT)" VAULT_PATH="$(VAULT_PATH)" VAULT_KEY="$(VAULT_KEY)" VAULT_VALUE="$$(openssl rand -hex 32)"
-
-read-vault:
-	bao kv get -mount=$(VAULT_MOUNT) $(VAULT_PATH)
+edit-secrets:
+	EDITOR=vim sops services/$(SERVICE)/secrets.enc.yml

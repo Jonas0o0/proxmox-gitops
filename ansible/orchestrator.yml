@@ -5,12 +5,10 @@
   vars_files: ["../settings.yml"]
 
   tasks:
-    - name: "Récupération Secrets OpenBao"
-      set_fact:
-        vault: "{{ lookup('community.hashi_vault.vault_kv2_get', 'proxmox-gitops', engine_mount='secret').data }}"
-      environment:
-        VAULT_ADDR: "http://192.168.10.15:80"
-        VAULT_TOKEN: "{{ lookup('env', 'VAULT_TOKEN') }}"
+    - name: "chargement des secrets sops"
+      community.sops.load_vars:
+        file: "vars/secrets.enc.yml"
+      no_log: true
 
     - name: "Application Infrastructure (Terraform)"
       shell: |

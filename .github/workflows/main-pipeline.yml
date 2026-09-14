@@ -126,7 +126,6 @@ jobs:
       - name: Vérifier l'environnement Ansible
         run: |
           ansible-playbook --version
-          python -c "from importlib.metadata import version; print('hvac', version('hvac'))"
 
       - name: Install Ansible Collections(on a du docker compose community)
         run: |
@@ -136,6 +135,6 @@ jobs:
       # avec la matrix tous les services définis vont faire N déplooiements ansible
       - name: "Déploiement de ${{ matrix.service }}"
         env:
-          VAULT_TOKEN: ${{ secrets.BAO_TOKEN }}
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
         run: |
           make deploy-compose-ci SERVICE=${{ matrix.service }}
