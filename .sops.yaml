@@ -1,0 +1,5 @@
+# https://github.com/getsops/sops
+creation_rules:
+  - path_regex: .*\.enc\.ya?ml$
+    # clé publique à générer (age-keygen)
+    age: "clé publique à générer"
