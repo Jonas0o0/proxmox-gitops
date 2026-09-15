@@ -1,4 +1,4 @@
-# la couche "bootstrap" doit être appliquée auparavant, car comprenant les sous-réseaux, le vault OpenBao et la VM template pour accélerer les créations d'instances. Ce sont tant de composants dont a besoin cette couche pour être efficace/sécurisée
+# la couche "bootstrap" doit être appliquée auparavant, car comprenant les sous-réseaux et la VM template pour accélérer les créations d'instances. Ce sont tant de composants dont a besoin cette couche pour être efficace/sécurisée
 
 module "minimal-backup" {
   source  = "../../../modules/backup"

@@ -59,35 +59,6 @@ resource "proxmox_virtual_environment_file" "cloud_init" {
   }
 }
 
-# vm dédiée vault
-# https://github.com/openbao/openbao
-# https://hub.docker.com/r/openbao/openbao
-module "vault" {
-  source = "../../../modules/vm"
-
-  name                = "vault"
-  username            = "admin"
-  node_name           = var.node_name
-  vm_id               = 115
-  vm_template_id      = 9000
-  vm_ip               = "192.168.10.15"
-  network_gateway     = "192.168.10.1"
-  ssh_public_key_path = var.ssh_public_key_path
-  target_datastore_id = var.storage
-  depends_on = [
-    proxmox_virtual_environment_vm.debian13
-  ]
-
-  cpu       = 1
-  memory    = 1024
-  disk_size = 15
-
-  bridge = "prvvnet1"
-  user_data_raw = templatefile("${path.root}/../../../../services/vault/cloud-init.yml", {
-    hostname       = "vault"
-    ssh_public_key = trimspace(file(pathexpand(var.ssh_public_key_path)))
-  })
-}
 
 # backend distant pour terraform notamment (Le state ne sera plus stocké en local)
 # https://github.com/Clivern/Lynx

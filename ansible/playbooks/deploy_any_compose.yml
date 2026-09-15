@@ -6,49 +6,22 @@
     - ../../settings.yml
   vars:
     # target_service attendu en argument
-    # target_service attendu en argument
     target_remote_dir: "/opt"
     target_local_dir: "{{ playbook_dir }}/../../services/{{ target_service }}"
 
   tasks:
-    # il faut la library python 'hvac' sur la machine qui lance le playbook (pas la machine cible) apt install python3-hvac
-    - name: vérifier si la machine qui lance a la library python 'hvac' ; c'est requis pour acceder au vault dans le playbook
-      ansible.builtin.apt:
-        name: python3-hvac
-        state: present
-        update_cache: true
+    - name: vérifier si le service a des secrets sops
+      ansible.builtin.stat:
+        path: "{{ target_local_dir }}/secrets.enc.yml"
+      register: sops_secret_file
       delegate_to: localhost
-      become: true # donc lancer ansible avec l'option -K (ca va demander le mot de passe d'élévation)
-      run_once: true
-    
-    # actuellement on a du https interne car on a pas encore fait les certificats publics pour le réseau privé, d'où le validate_certs
-    - name: charger les secrets openbao relatifs au service (et uniquement ceux-là)
-      ansible.builtin.set_fact:
-        vault: >-
-          {{
-            {
-              target_service: lookup(
-                'community.hashi_vault.vault_kv2_get',
-                target_service,
-                engine_mount_point='secret',
-                url='https://192.168.10.15',
-                validate_certs=false,
-                token_path=lookup('env', 'HOME'),
-                token_file='.vault-token'
-              ).secret
-            }
-          }}
-      # pour debug on peut enlever no log
+
+    - name: charger les secrets sops relatifs au service (et uniquement ceux-là)
+      community.sops.load_vars:
+        file: "{{ target_local_dir }}/secrets.enc.yml"
+      when: sops_secret_file.stat.exists
       no_log: true
-      ignore_errors: true 
-      register: openbao_fetch
 
-    - name: avertir le cas de l'erreur openbao
-      ansible.builtin.debug:
-        msg: "AVERTISSEMENT : Aucun secret n'a pu être retrouvé (c'est peut etre normal, il peut ne pas y en avoir pour le service voulu)"
-      when: openbao_fetch is failed
-
-      # si il y a un probleme de token, tenter .bao-token plutot que .vault-token
     # cette tache évite la redondance pour la configuration des sites regardés en générant la configuration à partir des sites de Caddy
     # j'ai essayé avec des spotters de certs (= surveiller les sous domaines d'un domaine) mais c'est en retard sur la réalité
     - name: exclusif au service monitoring ; on charge les sites en variable pour générer le template des sites à surveiller le statut (voir monitoring/gatus/config/sites.yaml.j2)
@@ -103,6 +76,10 @@
         path: "{{ target_remote_dir }}/{{ target_service }}/{{ item.path }}"
       loop: "{{ query('community.general.filetree', target_local_dir) }}"
       when: item.state == 'file' and item.path.endswith('.j2')
+    - name: supprimer les secrets chiffrés sur le remote (= pas besoin de les laisser là-bas)
+      ansible.builtin.file:
+        state: absent
+        path: "{{ target_remote_dir }}/{{ target_service }}/secrets.enc.yml"
 
     - name: S'assurer que la stack est présente et démarrée
       community.docker.docker_compose_v2:

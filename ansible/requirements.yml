@@ -3,4 +3,4 @@ collections:
     version: 6.1.0
   - name: community.docker
   - name: community.general
-  - name: community.hashi_vault
+  - name: community.sops
