@@ -11,6 +11,15 @@ NC='\033[0m'
 DEPENDENCIES=("git" "terraform" "ansible" "sops" "age" "j2")
 MISSING_COUNT=0
 
+# Demander pour Github CLI
+read -r -p "Voulez-vous utiliser Github CLI (gh) pour ajouter automatiquement les secrets sur le repo ? (o/N) : " USE_GH < /dev/tty
+if [[ "$USE_GH" =~ ^[OoYy]$ ]]; then
+    DEPENDENCIES+=("gh")
+    echo "USE_GH=true" > .setup_env
+else
+    echo "USE_GH=false" > .setup_env
+fi
+
 # Boucle de vérification
 for cmd in "${DEPENDENCIES[@]}"; do
     # 'command -v' vérifie si la commande existe dans le système
