@@ -1,0 +1,102 @@
+# approche bourrin avec 3 conteneurs en attendant de déployer le helm clean. 
+# C'est peut etre une approche à privilégier pour les machines peu puissantes / pour déployer rapidement avec un compose simple 
+# pour obtenir un GH Token allez sur (pour le depot voulu, nous c'est) : https://github.com/{{ github_org }}/proxmox-gitops/settings/actions/runners puis "new self-hosted runner "
+services:
+  containerized-runner-1:
+    image: local/github-runner:ubuntu-noble-ansible
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: containerized-runner-1
+    restart: unless-stopped
+    privileged: true
+    environment:
+      RUNNER_SCOPE: "org"
+      ORG_NAME: "{{ github_org }}"
+      RUNNER_NAME: "containerized-runner-1"
+      RUNNER_WORKDIR: "/tmp/runner/work"
+      LABELS: "self-hosted,komodo"
+      ACCESS_TOKEN: "${GITHUB_RUNNER_PAT:?GITHUB_RUNNER_PAT is required}"
+      CONFIGURED_ACTIONS_RUNNER_FILES_DIR: "/runner/data"
+      DISABLE_AUTOMATIC_DEREGISTRATION: "true"
+      START_DOCKER_SERVICE: "true"
+      UNSET_CONFIG_VARS: "true"
+    tmpfs:
+      - /tmp
+    volumes:
+      - runner-tmp:/tmp/runner
+      - runner-data:/runner/data
+      - runner-docker:/var/lib/docker
+    networks:
+      - runner_net
+
+  containerized-runner-2:
+    image: local/github-runner:ubuntu-noble-ansible
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: containerized-runner-2
+    restart: unless-stopped
+    privileged: true
+    environment:
+      RUNNER_SCOPE: "org"
+      ORG_NAME: "{{ github_org }}"
+      RUNNER_NAME: "containerized-runner-2"
+      RUNNER_WORKDIR: "/tmp/runner/work"
+      LABELS: "self-hosted,komodo"
+      ACCESS_TOKEN: "${GITHUB_RUNNER_PAT:?GITHUB_RUNNER_PAT is required}"
+      CONFIGURED_ACTIONS_RUNNER_FILES_DIR: "/runner/data"
+      DISABLE_AUTOMATIC_DEREGISTRATION: "true"
+      START_DOCKER_SERVICE: "true"
+      UNSET_CONFIG_VARS: "true"
+    tmpfs:
+      - /tmp
+    volumes:
+      - runner-tmp-2:/tmp/runner
+      - runner-data-2:/runner/data
+      - runner-docker-2:/var/lib/docker
+    networks:
+      - runner_net
+
+  containerized-runner-3:
+    image: local/github-runner:ubuntu-noble-ansible
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: containerized-runner-3
+    restart: unless-stopped
+    privileged: true
+    environment:
+      RUNNER_SCOPE: "org"
+      ORG_NAME: "{{ github_org }}"
+      RUNNER_NAME: "containerized-runner-3"
+      RUNNER_WORKDIR: "/tmp/runner/work"
+      LABELS: "self-hosted,komodo"
+      ACCESS_TOKEN: "${GITHUB_RUNNER_PAT:?GITHUB_RUNNER_PAT is required}"
+      CONFIGURED_ACTIONS_RUNNER_FILES_DIR: "/runner/data"
+      DISABLE_AUTOMATIC_DEREGISTRATION: "true"
+      START_DOCKER_SERVICE: "true"
+      UNSET_CONFIG_VARS: "true"
+    tmpfs:
+      - /tmp
+    volumes:
+      - runner-tmp-3:/tmp/runner
+      - runner-data-3:/runner/data
+      - runner-docker-3:/var/lib/docker
+    networks:
+      - runner_net
+
+volumes:
+  runner-tmp:
+  runner-data:
+  runner-docker:
+  runner-tmp-2:
+  runner-data-2:
+  runner-docker-2:
+  runner-tmp-3:
+  runner-data-3:
+  runner-docker-3:
+
+networks:
+  runner_net:
+    driver: bridge

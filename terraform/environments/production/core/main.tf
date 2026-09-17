@@ -36,7 +36,7 @@ module "gh-runner" {
 module "coredns" {
   source              = "../../../modules/lxc"
   name                = "coredns"
-  node_name           = "pve1"
+  node_name           = var.node_name
   lxc_id              = 112
   lxc_ip              = "192.168.10.12"
   network_gateway     = "192.168.10.1"

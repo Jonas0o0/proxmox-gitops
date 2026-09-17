@@ -1,7 +1,7 @@
 # raccourci de liens vers le contenu brut du dépôt proxmox-gitops
 
 https://get.{{ domain }} {
-	rewrite * /jobacogiez-org/proxmox-gitops/main{uri}
+	rewrite * /{{ github_org }}/proxmox-gitops/main{uri}
 
 	reverse_proxy https://raw.githubusercontent.com {
 		header_up Host raw.githubusercontent.com
@@ -9,7 +9,7 @@ https://get.{{ domain }} {
 }
 
 https://get.priv.{{ domain }} {
-	rewrite * /jobacogiez-org/proxmox-gitops/main{uri}
+	rewrite * /{{ github_org }}/proxmox-gitops/main{uri}
 
 	reverse_proxy https://raw.githubusercontent.com {
 		header_up Host raw.githubusercontent.com
