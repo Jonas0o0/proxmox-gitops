@@ -17,24 +17,30 @@ lint-tflint:
 	docker run --rm -v "$${PWD}:/repo" -w /repo ghcr.io/terraform-linters/tflint:latest --recursive
 
 
-# défaut
+# défaut
 TF_LAYER ?=core
 tf: 
 	cd $(TF_DIR)/$(TF_LAYER) && \
-	. ./remote-backend-init.sh && \
-	terraform $(ACTION)
+	if [ -f ./remote-backend-init.sh ]; then . ./remote-backend-init.sh; fi && \
+	if [ -f ../terraform.enc.tfvars ]; then \
+		sops --input-type binary --output-type binary exec-file ../terraform.enc.tfvars 'terraform $(ACTION) -var-file="{}"'; \
+	elif [ -f ../terraform.tfvars ]; then \
+		terraform $(ACTION) -var-file="../terraform.tfvars"; \
+	else \
+		terraform $(ACTION); \
+	fi
 
 tf-init: 
-	$(MAKE) tf $(TF_LAYER) ACTION=init
+	$(MAKE) tf TF_LAYER=$(TF_LAYER) ACTION=init
 
 tf-plan: 
-	$(MAKE) tf $(TF_LAYER) ACTION=plan
+	$(MAKE) tf TF_LAYER=$(TF_LAYER) ACTION=plan
 
 tf-apply: 
-	$(MAKE) tf $(TF_LAYER) ACTION=apply
+	$(MAKE) tf TF_LAYER=$(TF_LAYER) ACTION=apply
 
 tf-destroy: 
-	$(MAKE) tf $(TF_LAYER) ACTION=destroy
+	$(MAKE) tf TF_LAYER=$(TF_LAYER) ACTION=destroy
 
 deploy-compose-ci:
 	ANSIBLE_STRICT_HOST_KEY_CHECKING=false ansible-playbook ansible/playbooks/deploy_any_compose.yml -e "host=$(SERVICE) target_service=$(SERVICE)" -i $(ANSIBLE_INVENTORY) $(EXTRA_ARGS)
