@@ -217,6 +217,24 @@ def main():
             outfile.write(var_regex.sub(replacer, line))
             
     print("\n===========================================================")
+    print("[INFO] Vérification de l'environnement Proxmox")
+    print("===========================================================")
+    print_info("Création du dossier snippets sur Proxmox si inexistant...")
+    try:
+        ssh_key = os.path.expanduser(f"~/.ssh/{answers.get('PROXMOX_SSH_KEY_NAME', 'proxmox_terraform')}")
+        ssh_user = answers.get("PROXMOX_SSH_USER", "root")
+        ssh_host = answers.get("PROXMOX_HOST_IP")
+        if ssh_host:
+            # On s'assure que le dossier existe ET que Proxmox est configuré pour accepter les snippets sur 'local'
+            subprocess.run([
+                "ssh", "-o", "StrictHostKeyChecking=no", "-i", ssh_key, f"{ssh_user}@{ssh_host}", 
+                "mkdir -p /var/lib/vz/snippets && pvesm set local --content backup,iso,vztmpl,snippets || true"
+            ], check=True)
+            print_success("Dossier snippets configuré sur le nœud.")
+    except Exception as e:
+        print_warning(f"Impossible de créer le dossier snippets via SSH ({e}). Assurez-vous qu'il existe.")
+
+    print("\n===========================================================")
     print("[INFO] Déploiement de l'infrastructure avec Terraform")
     print("===========================================================")
     subprocess.run(["make", "tf", "TF_LAYER=bootstrap", "ACTION=init"], check=True)
