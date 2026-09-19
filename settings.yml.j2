@@ -9,4 +9,26 @@ proxmox:
   node: "{{ SETTINGS_PROXMOX_NODE }}"
   storage: "{{ SETTINGS_PROXMOX_STORAGE }}"
   ssh_user: "{{ SETTINGS_PROXMOX_SSH_USER }}"
-  
+
+# Configuration SOPS - Tous les secrets des services sont centralisés ici
+secrets:
+  authentik:
+    pg_pass: "{{ SECRETS_AUTHENTIK_PG_PASS }}"
+    secret_key: "{{ SECRETS_AUTHENTIK_SECRET_KEY }}"
+  caddy:
+    cloudflare_api_token: "{{ SECRETS_CADDY_CLOUDFLARE_API_TOKEN }}"
+  cloudflared:
+    tunnel_id: "{{ SECRETS_CLOUDFLARED_TUNNEL_ID }}"
+    credentials_json: "{{ SECRETS_CLOUDFLARED_CREDENTIALS_JSON }}"
+  gh_runner_compose:
+    pat_token: "{{ SECRETS_GH_RUNNER_COMPOSE_PAT_TOKEN }}"
+  komodo:
+    database_password: "{{ SECRETS_KOMODO_DATABASE_PASSWORD }}"
+    init_admin_password: "{{ SECRETS_KOMODO_INIT_ADMIN_PASSWORD }}"
+    webhook_secret: "{{ SECRETS_KOMODO_WEBHOOK_SECRET }}"
+    jwt_secret: "{{ SECRETS_KOMODO_JWT_SECRET }}"
+  monitoring:
+    grafana_admin_password: "{{ SECRETS_MONITORING_GRAFANA_ADMIN_PASSWORD }}"
+    pve_exporter_token_value: "{{ SECRETS_MONITORING_PVE_EXPORTER_TOKEN_VALUE }}"
+  proxmox:
+    api_token: "{{ SECRETS_PROXMOX_API_TOKEN }}"

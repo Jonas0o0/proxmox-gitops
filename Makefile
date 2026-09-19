@@ -57,4 +57,4 @@ deploy-lxc:
 	ANSIBLE_STRICT_HOST_KEY_CHECKING=false ansible-playbook ansible/playbooks/bootstrap.yml -i $(ANSIBLE_INVENTORIES)/lxc_inventory.yml $(EXTRA_ARGS)
 
 edit-secrets:
-	EDITOR=vim sops services/$(SERVICE)/secrets.enc.yml
+	EDITOR=vim sops settings.enc.yml

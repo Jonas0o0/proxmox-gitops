@@ -2,19 +2,17 @@
   hosts: localhost
   connection: local
   gather_facts: false
-  vars_files: ["../settings.yml"]
 
   tasks:
-    - name: "chargement des secrets sops"
+    - name: "chargement des configurations et secrets"
       community.sops.load_vars:
-        file: "vars/secrets.enc.yml"
+        file: "../settings.enc.yml"
       no_log: true
-
     - name: "Application Infrastructure (Terraform)"
       shell: |
         terraform init
         terraform apply -auto-approve \
-          -var="proxmox_api_token={{ vault.proxmox_api_token }}" \
+          -var="proxmox_api_token={{ secrets.proxmox.api_token }}" \
           -var="proxmox_endpoint={{ proxmox.endpoint }}" \
           -var="storage={{ proxmox.storage }}" \
           -var="ssh_public_key_path=~/.ssh/id_rsa.pub"

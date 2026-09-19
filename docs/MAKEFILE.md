@@ -52,7 +52,7 @@ Toutes les cibles de déploiement contournent la vérification stricte des clés
 
 | Cible | Description |
 |---|---|
-| `edit-secrets` | Ouvre le fichier de secrets chiffré par SOPS pour un `SERVICE` spécifique dans l'éditeur de texte par défaut (`vim`). Les modifications sont chiffrées automatiquement lors de la sauvegarde. |
+| `edit-secrets` | Ouvre le fichier de secrets centralisé `settings.enc.yml` chiffré par SOPS dans l'éditeur de texte par défaut (`vim`). Les modifications sont chiffrées automatiquement lors de la sauvegarde. |
 
 ### Assurance Qualité et Sécurité (Linters)
 
@@ -85,6 +85,6 @@ make deploy-lxc
 
 **Secrets :**
 ```bash
-# Éditer les secrets pour le service 'caddy'
-make edit-secrets SERVICE=caddy
+# Éditer les secrets
+make edit-secrets
 ```

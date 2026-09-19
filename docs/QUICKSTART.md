@@ -30,12 +30,22 @@ Terraform et Ansible ont besoin d'un accès SSH à votre hôte Proxmox.
    ```
 
 ### B. Création d'un Token API Proxmox (Pour Terraform)
-L'infrastructure as code (Terraform) a besoin d'interagir avec l'API de Proxmox de manière sécurisée et sans intervention manuelle.
-1. Connectez-vous à l'interface web de Proxmox (`https://<IP_PROXMOX>:8006`).
-2. Allez dans **Datacenter > Permissions > Users** et créez un nouvel utilisateur (ex: `terraform@pve`).
-3. Allez dans **Datacenter > Permissions > API Tokens**, cliquez sur "Add" et créez un token pour l'utilisateur `terraform@pve` (décochez impérativement la case "Privilege Separation").
-4. **Notez précieusement le `Token ID` et le `Secret`** affichés à l'écran, ils vous seront demandés par le script d'initialisation (le secret ne sera affiché qu'une seule fois !).
-5. Allez dans **Datacenter > Permissions**, et ajoutez une permission globale (Path: `/`) pour l'utilisateur `terraform@pve` avec le rôle `Administrator`.
+L'infrastructure as code (Terraform) a besoin d'interagir avec l'API de Proxmox de manière sécurisée et sans intervention manuelle. 
+Au lieu de passer par l'interface web, ouvrez le **shell de votre serveur Proxmox** (ou connectez-vous en SSH en tant que `root`) et lancez les commandes suivantes :
+
+```bash
+# 1. Création de l'utilisateur 'terraform'
+pveum user add terraform@pve
+
+# 2. Attribution des droits d'Administrateur global à l'utilisateur
+pveum acl modify / -user terraform@pve -role Administrator
+
+# 3. Création du Token API (sans séparation des privilèges)
+pveum user token add terraform@pve provision -privsep 0
+```
+
+> **⚠️ IMPORTANT :** La dernière commande va vous afficher la valeur du **secret**. 
+> Notez précieusement la valeur affichée sous `value:` (c'est votre *Token Secret*) ainsi que l'identifiant complet (ici `terraform@pve!provision` qui est votre *Token ID*). Ils vous seront demandés par le script d'initialisation !
 
 ### C. Paquets sur Proxmox (Pour Ansible)
 Par défaut, Proxmox n'installe pas `sudo`. Cependant, nos scripts de déploiement Ansible en ont besoin pour l'élévation de privilèges de certains services.
@@ -48,15 +58,15 @@ apt update && apt install -y sudo
 
 Une fois les prérequis validés (SSH et API Token en poche), vous êtes prêt à configurer votre dépôt. 
 
-Ouvrez un terminal sur votre machine personnelle et téléchargez le script d'initialisation. Ce script s'occupera de cloner votre dépôt et de préparer l'environnement chiffré :
+Ouvrez un terminal sur votre machine personnelle et téléchargez votre dépôt. Ce script s'occupera ensuite de préparer l'environnement chiffré et l'infrastructure :
 
 ```bash
-# Téléchargement du script d'initialisation (à adapter avec le nom de votre fork)
-wget https://raw.githubusercontent.com/votre-orga/proxmox-gitops/main/helper-scripts/init.sh
-chmod +x init.sh
+# Téléchargement du dépôt complet (remplacez l'URL par celle de votre propre fork/dépôt)
+git clone https://github.com/votre-orga/proxmox-gitops.git
+cd proxmox-gitops
 
 # Lancement interactif de l'initialisation
-./init.sh
+./helper-scripts/init.sh
 ```
 
 *Le script vous guidera ensuite pas à pas (installation des dépendances, configuration du domaine, orga Github, création de la clé de chiffrement SOPS, et premier lancement de Terraform).*
