@@ -2,6 +2,8 @@ resource "proxmox_download_file" "debian13" {
   node_name    = var.node_name
   datastore_id = var.backup_storage
   content_type = "import"
+  overwrite    = true
+  overwrite_unmanaged = true
 
   url       = "https://cloud.debian.org/cdimage/cloud/trixie/20260623-2518/debian-13-generic-amd64-20260623-2518.qcow2"
   file_name = "debian-13-genericcloud-amd64.qcow2"
@@ -31,7 +33,7 @@ resource "proxmox_virtual_environment_vm" "debian13" {
   }
 
   initialization {
-    datastore_id      = "local"
+    datastore_id      = var.backup_storage
     user_data_file_id = proxmox_virtual_environment_file.cloud_init.id
 
     ip_config {
