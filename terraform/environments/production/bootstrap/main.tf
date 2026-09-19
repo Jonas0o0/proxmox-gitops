@@ -26,7 +26,7 @@ resource "proxmox_virtual_environment_vm" "debian13" {
   }
 
   disk {
-    datastore_id = var.backup_storage
+    datastore_id = var.storage
     file_id      = proxmox_download_file.debian13.id
     interface    = "scsi0"
     discard      = "on"
