@@ -86,3 +86,8 @@ variable "dns_servers" {
   type = list(string)
   default = ["192.168.10.12", "1.1.1.1", "8.8.8.8"]
 }
+
+variable "backup_datastore_id" {
+  type    = string
+  default = "local"
+}

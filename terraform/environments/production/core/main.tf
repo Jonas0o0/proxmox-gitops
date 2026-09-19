@@ -19,6 +19,7 @@ module "gh-runner" {
   dns_servers         = ["192.168.10.12", "1.1.1.1", "8.8.8.8"]
   ssh_public_key_path = var.ssh_public_key_path
   target_datastore_id = var.storage
+  backup_datastore_id = var.backup_storage
 
   cpu       = 4
   memory    = 8192
@@ -43,6 +44,7 @@ module "coredns" {
   ssh_public_key_path = var.ssh_public_key_path
   target_datastore_id = var.storage
 
+
   cpu       = 1
   memory    = 512
   disk_size = 5
@@ -66,6 +68,7 @@ module "caddy" {
   ssh_public_key_path = var.ssh_public_key_path
   target_datastore_id = var.storage
 
+
   cpu       = 1
   memory    = 512
   disk_size = 10
@@ -84,6 +87,7 @@ module "monitoring" {
   network_gateway     = "192.168.10.1"
   ssh_public_key_path = var.ssh_public_key_path
   target_datastore_id = var.storage
+
 
   cpu       = 2
   memory    = 2048
@@ -106,6 +110,7 @@ module "komodo" {
   network_gateway     = "172.16.10.1"
   ssh_public_key_path = var.ssh_public_key_path
   target_datastore_id = var.storage
+  backup_datastore_id = var.backup_storage
 
   cpu       = 3
   memory    = 4096
@@ -131,6 +136,7 @@ module "cloudflared" {
   ssh_public_key_path = var.ssh_public_key_path
   target_datastore_id = var.storage
 
+
   cpu       = 1
   memory    = 256
   disk_size = 8
@@ -150,6 +156,7 @@ module "authentik" {
   network_gateway     = "192.168.10.1"
   ssh_public_key_path = var.ssh_public_key_path
   target_datastore_id = var.storage
+  backup_datastore_id = var.backup_storage
 
   cpu       = 1
   memory    = 2048

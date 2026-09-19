@@ -83,7 +83,7 @@ resource "proxmox_virtual_environment_firewall_options" "this" {
 
 resource "proxmox_virtual_environment_file" "boostrap_user_data" {
   content_type = "snippets"
-  datastore_id = "local" # encrypted-zfs ne peut pas supporter autre chose que des vm, ne pas changer ça. ca va stocker les fichiers de cloud init
+  datastore_id = var.backup_datastore_id # encrypted-zfs ne peut pas supporter autre chose que des vm, ne pas changer ça. ca va stocker les fichiers de cloud init
   node_name    = var.node_name
 
   source_raw {
