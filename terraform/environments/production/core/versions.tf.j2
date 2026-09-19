@@ -13,9 +13,9 @@ terraform {
     # faire remote-backend-init.sh avant
 
     # url à remplacer selon le domaine. Suivre la procédure "docs/TERRAFORM-REMOTE-STATE.md"
-    address = "https://terraform-backend.priv.{{ SETTINGS_DOMAIN }}/client/{{ SETTINGS_GITHUB_ORG }}/{{ SETTINGS_GITHUB_REPO }}/{{ SETTINGS_PROXMOX_NODE }}/state"
-    lock_address = "https://terraform-backend.priv.{{ SETTINGS_DOMAIN }}/client/{{ SETTINGS_GITHUB_ORG }}/{{ SETTINGS_GITHUB_REPO }}/{{ SETTINGS_PROXMOX_NODE }}/lock"
-    unlock_address = "https://terraform-backend.priv.{{ SETTINGS_DOMAIN }}/client/{{ SETTINGS_GITHUB_ORG }}/{{ SETTINGS_GITHUB_REPO }}/{{ SETTINGS_PROXMOX_NODE }}/unlock"
+    address = "https://terraform-backend.priv.{{ DOMAIN }}/client/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/{{ PROXMOX_NODE }}/state"
+    lock_address = "https://terraform-backend.priv.{{ DOMAIN }}/client/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/{{ PROXMOX_NODE }}/lock"
+    unlock_address = "https://terraform-backend.priv.{{ DOMAIN }}/client/{{ GITHUB_ORG }}/{{ GITHUB_REPO }}/{{ PROXMOX_NODE }}/unlock"
     lock_method = "POST"
     unlock_method = "POST"
   }

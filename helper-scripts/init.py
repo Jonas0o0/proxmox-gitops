@@ -161,6 +161,28 @@ def render_and_encrypt(template_path, output_enc_path, answers):
     os.remove(tmp_path)
     print_success(f"{output_enc_path} généré.")
 
+def get_github_info():
+    print_info("Détection automatique de l'organisation et du dépôt GitHub...")
+    try:
+        remote_url = subprocess.check_output(["git", "remote", "get-url", "origin"], text=True).strip()
+        # Handle both SSH and HTTPS
+        # SSH: git@github.com:Orga/Repo.git
+        # HTTPS: https://github.com/Orga/Repo.git
+        if remote_url.startswith("git@"):
+            path = remote_url.split(":")[1]
+        elif remote_url.startswith("https://"):
+            path = remote_url.split("github.com/")[1]
+        else:
+            return {}
+            
+        path = path.replace(".git", "")
+        org, repo = path.split("/")
+        print_success(f"Détecté : {org}/{repo}")
+        return {"GITHUB_ORG": org, "GITHUB_REPO": repo}
+    except Exception as e:
+        print_warning("Impossible de détecter automatiquement l'organisation GitHub.")
+        return {}
+
 def main():
     print("===========================================================")
     print("[INFO] Initialisation Intelligente Proxmox GitOps")
@@ -179,7 +201,7 @@ def main():
         "terraform/environments/production/core/versions.tf.j2"
     ]
     
-    answers = {}
+    answers = get_github_info()
     answers = parse_and_prompt(templates_to_parse, answers)
     
     render_and_encrypt("settings.yml.j2", "settings.enc.yml", answers)

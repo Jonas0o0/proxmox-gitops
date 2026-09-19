@@ -1,34 +1,30 @@
-# URL de l'API Proxmox sans le /api2/json final (ex: https://pve.home.arpa:8006)
-proxmox_endpoint  = "{{ TF_PROXMOX_HOST }}/api2/json"
+# URL de l'API Proxmox
+proxmox_endpoint  = "https://{{ PROXMOX_HOST_IP }}:8006/api2/json"
 
 # Utilisateur Proxmox pour Terraform (ex: terraform)
 # Domaine de l'utilisateur (ex: pve ou pam)
 # Identifiant du Token (ex: provision)
 # Secret du Token (généré une seule fois par Proxmox)
-proxmox_api_token = "{{ TF_PROXMOX_USER }}@{{ TF_PROXMOX_REALM }}!{{ TF_PROXMOX_TOKEN_ID }}={{ TF_PROXMOX_TOKEN_SECRET }}"
+proxmox_api_token = "{{ PROXMOX_USER }}@{{ PROXMOX_REALM }}!{{ PROXMOX_TOKEN_ID }}={{ PROXMOX_TOKEN_SECRET }}"
 
 # Ignorer les erreurs TLS (true pour certificats auto-signés)
 proxmox_insecure = true
 
-proxmox_ssh_username         = "root"
+proxmox_ssh_username         = "{{ PROXMOX_SSH_USER }}"
 
-# Chemin vers votre clé privée SSH (ex: ~/.ssh/proxmox_terraform)
-proxmox_ssh_private_key_path = "{{ TF_PROXMOX_SSH_PRIVATE_KEY_PATH }}"
+# Nom du fichier de votre clé SSH (ex: proxmox_terraform)
+proxmox_ssh_private_key_path = "~/.ssh/{{ PROXMOX_SSH_KEY_NAME }}"
+ssh_public_key_path          = "~/.ssh/{{ PROXMOX_SSH_KEY_NAME }}.pub"
 
-# Chemin vers votre clé publique SSH (ex: ~/.ssh/proxmox_terraform.pub)
-ssh_public_key_path          = "{{ TF_PROXMOX_SSH_PUBLIC_KEY_PATH }}"
-
-# Stockage par défaut pour les disques (ex: local-lvm)
-storage        = "{{ TF_STORAGE }}"
+storage        = "{{ PROXMOX_STORAGE }}"
 
 # Stockage pour les sauvegardes et templates (ex: local)
-backup_storage = "{{ TF_BACKUP_STORAGE }}"
+backup_storage = "{{ BACKUP_STORAGE }}"
 
-# Nom du noeud Proxmox cible (ex: pve1)
-node_name      = "{{ TF_NODE_NAME }}"
+node_name      = "{{ PROXMOX_NODE }}"
 
 # Adresse IP locale du serveur Proxmox (ex: 192.168.1.100)
-proxmox_host_ip    = "{{ TF_PROXMOX_HOST_IP }}"
+proxmox_host_ip    = "{{ PROXMOX_HOST_IP }}"
 
 # Sous-réseau LAN de votre domicile (ex: 192.168.1.0/24)
-proxmox_lan_subnet = "{{ TF_PROXMOX_LAN_SUBNET }}"
+proxmox_lan_subnet = "{{ PROXMOX_LAN_SUBNET }}"
