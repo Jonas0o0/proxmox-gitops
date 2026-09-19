@@ -157,7 +157,7 @@ def render_and_encrypt(template_path, output_enc_path, answers):
             new_line = var_regex.sub(replacer, line)
             outfile.write(new_line)
             
-    subprocess.run(["sops", "-e", "--filename", output_enc_path, tmp_path], stdout=open(output_enc_path, "w"), check=True)
+    subprocess.run(["sops", "-e", "--filename-override", output_enc_path, tmp_path], stdout=open(output_enc_path, "w"), check=True)
     os.remove(tmp_path)
     print_success(f"{output_enc_path} généré.")
 
