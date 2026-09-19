@@ -65,8 +65,8 @@ Ouvrez un terminal sur votre machine personnelle et téléchargez votre dépôt.
 git clone https://github.com/votre-orga/proxmox-gitops.git
 cd proxmox-gitops
 
-# Lancement interactif de l'initialisation
-./helper-scripts/init.sh
+# Lancement interactif de l'initialisation intelligente
+python3 helper-scripts/init.py
 ```
 
 *Le script vous guidera ensuite pas à pas (installation des dépendances, configuration du domaine, orga Github, création de la clé de chiffrement SOPS, et premier lancement de Terraform).*

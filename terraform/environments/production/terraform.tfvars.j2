@@ -1,18 +1,34 @@
+# URL de l'API Proxmox sans le /api2/json final (ex: https://pve.home.arpa:8006)
 proxmox_endpoint  = "{{ TF_PROXMOX_HOST }}/api2/json"
-# vaut mieux faire un utilisateur séparé avec des permissions spéciales (voir API Token dans Proxmox datacenter)
+
+# Utilisateur Proxmox pour Terraform (ex: terraform)
+# Domaine de l'utilisateur (ex: pve ou pam)
+# Identifiant du Token (ex: provision)
+# Secret du Token (généré une seule fois par Proxmox)
 proxmox_api_token = "{{ TF_PROXMOX_USER }}@{{ TF_PROXMOX_REALM }}!{{ TF_PROXMOX_TOKEN_ID }}={{ TF_PROXMOX_TOKEN_SECRET }}"
 
-
-# pour le TLS
+# Ignorer les erreurs TLS (true pour certificats auto-signés)
 proxmox_insecure = true
 
 proxmox_ssh_username         = "root"
+
+# Chemin vers votre clé privée SSH (ex: ~/.ssh/proxmox_terraform)
 proxmox_ssh_private_key_path = "{{ TF_PROXMOX_SSH_PRIVATE_KEY_PATH }}"
+
+# Chemin vers votre clé publique SSH (ex: ~/.ssh/proxmox_terraform.pub)
 ssh_public_key_path          = "{{ TF_PROXMOX_SSH_PUBLIC_KEY_PATH }}"
 
+# Stockage par défaut pour les disques (ex: local-lvm)
 storage        = "{{ TF_STORAGE }}"
+
+# Stockage pour les sauvegardes et templates (ex: local)
 backup_storage = "{{ TF_BACKUP_STORAGE }}"
+
+# Nom du noeud Proxmox cible (ex: pve1)
 node_name      = "{{ TF_NODE_NAME }}"
 
+# Adresse IP locale du serveur Proxmox (ex: 192.168.1.100)
 proxmox_host_ip    = "{{ TF_PROXMOX_HOST_IP }}"
+
+# Sous-réseau LAN de votre domicile (ex: 192.168.1.0/24)
 proxmox_lan_subnet = "{{ TF_PROXMOX_LAN_SUBNET }}"
