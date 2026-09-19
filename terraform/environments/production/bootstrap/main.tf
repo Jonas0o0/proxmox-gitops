@@ -67,6 +67,8 @@ resource "proxmox_virtual_environment_file" "cloud_init" {
 module "terraform-backend" {
   source = "../../../modules/vm"
 
+  depends_on = [proxmox_virtual_environment_vm.debian13]
+
   name                = "terraform-backend"
   username            = "admin"
   node_name           = var.node_name

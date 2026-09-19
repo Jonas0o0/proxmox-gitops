@@ -2,7 +2,7 @@
 .terraform/
 *.tfstate
 *.tfstate.backup
-*.tfvars
+^(?!.*\.enc\.tfvars$).*\.tfvars$
 *.tfvars.json
 terraform/backend.tf
 terraform/tfplan
@@ -61,4 +61,3 @@ additions_fork.yml
 
 settings.yml
 *fork_addition*
-terraform/environments/production/core/versions.tf

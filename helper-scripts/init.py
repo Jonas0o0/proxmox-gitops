@@ -228,7 +228,7 @@ def main():
             # On s'assure que le dossier existe ET que Proxmox est configuré pour accepter les snippets sur 'local'
             subprocess.run([
                 "ssh", "-o", "StrictHostKeyChecking=no", "-i", ssh_key, f"{ssh_user}@{ssh_host}", 
-                "mkdir -p /var/lib/vz/snippets && pvesm set local --content backup,iso,vztmpl,snippets || true"
+                "mkdir -p /var/lib/vz/snippets && pvesm set local --content backup,iso,vztmpl,snippets,import || true"
             ], check=True)
             print_success("Dossier snippets configuré sur le nœud.")
     except Exception as e:
