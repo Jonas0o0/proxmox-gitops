@@ -134,5 +134,7 @@ jobs:
       #https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/run-job-variations
       # avec la matrix tous les services définis vont faire N déplooiements ansible
       - name: "Déploiement de ${{ matrix.service }}"
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
         run: |
           make deploy-compose-ci SERVICE=${{ matrix.service }}
