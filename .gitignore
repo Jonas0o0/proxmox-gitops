@@ -61,3 +61,4 @@ additions_fork.yml
 
 settings.yml
 *fork_addition*
+terraform/environments/production/core/versions.tf
