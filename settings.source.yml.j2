@@ -21,8 +21,27 @@ proxmox:
   # Stockage Proxmox pour les disques de VM (ex: local-lvm ou local-zfs)
   storage: "{{ PROXMOX_STORAGE }}"
   
+  # Stockage pour les sauvegardes et templates (ex: local)
+  backup_storage: "{{ BACKUP_STORAGE }}"
+  
   # Utilisateur SSH pour se connecter à Proxmox (ex: root)
   ssh_user: "{{ PROXMOX_SSH_USER }}"
+  
+  # Nom du fichier de clé SSH pour Proxmox (ex: proxmox_terraform)
+  ssh_key_name: "{{ PROXMOX_SSH_KEY_NAME }}"
+  
+  # Utilisateur et token Proxmox pour Terraform
+  user: "{{ PROXMOX_USER }}"
+  realm: "{{ PROXMOX_REALM }}"
+  token_id: "{{ PROXMOX_TOKEN_ID }}"
+  token_secret: "{{ PROXMOX_TOKEN_SECRET }}"
+
+monitoring:
+  # Configuration pour pve_exporter et prometheus/loki
+  pve_user: "{{ PVE_USER }}"
+  pve_token_name: "{{ PVE_TOKEN_NAME }}"
+  prometheus_retention: "{{ PROMETHEUS_RETENTION }}"
+  loki_retention: "{{ LOKI_RETENTION }}"
 
 # Configuration SOPS - Tous les secrets des services sont centralisés ici
 secrets:
