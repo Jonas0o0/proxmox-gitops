@@ -6,7 +6,7 @@ Leur rôle est de préparer vos variables (domaines, identifiants Proxmox, param
 
 ### Script disponible
 
-- `init.py` : C'est le script principal (écrit en Python pour une plus grande robustesse et une analyse dynamique). Il orchestre l'ensemble du processus. Il vérifie les dépendances, scanne intelligemment vos fichiers `.j2` pour générer un questionnaire personnalisé basé sur vos commentaires, génère les fichiers de variables chiffrés et lance le déploiement initial complet de Terraform (couches `bootstrap` et `core`). **C'est le seul script que vous avez besoin de lancer.**
+- `init.sh` : C'est le script principal. Il orchestre l'ensemble du processus d'initialisation. Il vérifie les dépendances, configure les hooks Git, met en place SOPS/AGE, et extrait intelligemment les variables de `settings.source.yml.j2` pour vous permettre de configurer `settings.enc.yml`. Enfin, il s'assure que les variables Terraform sont générées et chiffrées correctement. **C'est le seul script que vous avez besoin de lancer.**
 
 ### Utilisation au quotidien
 
