@@ -52,7 +52,9 @@ Toutes les cibles de déploiement contournent la vérification stricte des clés
 
 | Cible | Description |
 |---|---|
-| `edit-secrets` | Ouvre le fichier de secrets centralisé `settings.enc.yml` chiffré par SOPS dans l'éditeur de texte par défaut (`vim`). Les modifications sont chiffrées automatiquement lors de la sauvegarde. |
+| `edit-secrets` | Ouvre le fichier de secrets centralisé `settings.enc.yml` chiffré par SOPS dans l'éditeur (`vim`). À la sauvegarde, relance automatiquement `render-templates` pour répercuter les modifications. |
+| `render-templates` | Déchiffre `settings.enc.yml`, génère `terraform.tfvars` (et `versions.tf`) via Jinja2, puis rechiffre nativement `terraform.tfvars` en `terraform.enc.tfvars`. |
+| `decrypt-templates` | Régénère la version en clair de `terraform.tfvars` à partir du fichier `terraform.enc.tfvars` (très utile après avoir récupéré le code depuis Git). |
 
 ### Assurance Qualité et Sécurité (Linters)
 

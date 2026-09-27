@@ -56,5 +56,21 @@ deploy-alloy:
 deploy-lxc: 
 	ANSIBLE_STRICT_HOST_KEY_CHECKING=false ansible-playbook ansible/playbooks/bootstrap.yml -i $(ANSIBLE_INVENTORIES)/lxc_inventory.yml $(EXTRA_ARGS)
 
+render-templates:
+	@echo "[INFO] Génération des fichiers Terraform depuis settings.enc.yml..."
+	@sops -d settings.enc.yml > .tmp-vars.yml
+	@j2 terraform/environments/production/core/versions.tf.j2 .tmp-vars.yml > terraform/environments/production/core/versions.tf
+	@j2 terraform/environments/production/terraform.tfvars.j2 .tmp-vars.yml > terraform/environments/production/terraform.tfvars
+	@cp terraform/environments/production/terraform.tfvars terraform/environments/production/terraform.enc.tfvars
+	@sops --input-type binary --output-type binary -e -i terraform/environments/production/terraform.enc.tfvars
+	@echo "[INFO] terraform.enc.tfvars chiffré et prêt à être commit."
+	@rm -f .tmp-vars.yml
+
+decrypt-templates:
+	@echo "[INFO] Déchiffrement de terraform.enc.tfvars..."
+	@sops -d terraform/environments/production/terraform.enc.tfvars > terraform/environments/production/terraform.tfvars
+	@echo "[INFO] terraform.tfvars généré."
+
 edit-secrets:
 	EDITOR=vim sops settings.enc.yml
+	$(MAKE) render-templates
