@@ -2,7 +2,7 @@
 .terraform/
 *.tfstate
 *.tfstate.backup
-^(?!.*\.enc\.tfvars$).*\.tfvars$
+*.tfvars
 *.tfvars.json
 terraform/backend.tf
 terraform/tfplan
