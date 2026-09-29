@@ -1,0 +1,25 @@
+===========================================================
+=== INITIALISATION TERMINÉE AVEC SUCCÈS ===
+===========================================================
+
+Prochaines étapes requises :
+
+1. Configurer la CI/CD GitHub :
+   Copiez la clé privée affichée à la fin de ce message et ajoutez-la dans les secrets de votre dépôt GitHub
+   (Settings > Secrets and variables > Actions > New repository secret)
+   Nom du secret : SOPS_AGE_KEY
+
+2. Déployer l'infrastructure :
+   Vous pouvez maintenant déployer votre infrastructure étape par étape :
+   - D'abord le bootstrap Terraform :
+     make tf-apply TF_LAYER=bootstrap
+   - Ensuite la couche core Terraform :
+     make tf-apply
+   - Puis provisionner les conteneurs LXC via Ansible :
+     make deploy-lxc
+
+Bon déploiement !
+
+===========================================================
+Voici la clé privée (SOPS_AGE_KEY) :
+===========================================================

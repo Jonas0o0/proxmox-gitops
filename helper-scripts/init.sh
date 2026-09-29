@@ -134,26 +134,6 @@ for item in "${SECRETS_TO_GENERATE[@]}"; do
     generate_secret "$tpl" "$sec" "$desc"
 done
 
-echo -e "\n${GREEN}===========================================================${NC}"
-echo -e "${GREEN}=== INITIALISATION TERMINÉE AVEC SUCCÈS ===${NC}"
-echo -e "${GREEN}===========================================================${NC}\n"
-
-echo -e "${YELLOW}Prochaines étapes requises :${NC}\n"
-
-echo -e "1. ${BLUE}Configurer la CI/CD GitHub :${NC}"
-echo -e "   Copiez la clé privée ci-dessous et ajoutez-la dans les secrets de votre dépôt GitHub"
-echo -e "   (Settings > Secrets and variables > Actions > New repository secret)"
-echo -e "   Nom du secret : ${GREEN}SOPS_AGE_KEY${NC}"
-echo -e "   Valeur du secret :\n"
+cat "$(dirname "$0")/next_steps.txt"
 cat "$KEY_FILE"
-echo -e "\n"
-
-echo -e "2. ${BLUE}Déployer l'infrastructure :${NC}"
-echo -e "   Vous pouvez maintenant déployer votre infrastructure étape par étape :"
-echo -e "   - D'abord le bootstrap Terraform :"
-echo -e "     ${GREEN}make tf-apply TF_LAYER=bootstrap${NC}"
-echo -e "   - Ensuite la couche core Terraform :"
-echo -e "     ${GREEN}make tf-apply${NC}"
-echo -e "   - Puis provisionner les conteneurs LXC via Ansible :"
-echo -e "     ${GREEN}make deploy-lxc${NC}"
-echo -e "\nBon déploiement !"
+echo ""
