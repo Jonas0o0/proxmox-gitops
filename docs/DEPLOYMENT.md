@@ -57,7 +57,7 @@ Pour que vos secrets soient connus d'Ansible et correctement injectés, vous dev
    Sauvegardez et quittez. SOPS va instantanément rechiffrer le fichier et le sauvegarder. Vous pouvez ensuite le *commiter* sur Git.
 
 2. **(Optionnel) Maintenir le template à jour** :
-   Pour que les futurs utilisateurs (ou les futures installations) sachent quelles variables sont requises, il est de bonne pratique d'ajouter également ces clés dans `settings.yml.j2` :
+   Pour que les futurs utilisateurs (ou les futures installations) sachent quelles variables sont requises, il est de bonne pratique d'ajouter également ces clés dans `settings.source.yml` :
    ```yaml
    secrets:
      # ...

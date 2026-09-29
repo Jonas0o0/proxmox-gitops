@@ -13,10 +13,10 @@ KEY_FILE="$KEYS_DIR/keys.txt"
 EDITOR="${EDITOR:-sops}"
 
 declare -a SECRETS_TO_GENERATE=(
-    "settings.source.yml.j2|settings.enc.yml|Configuration globale (Source de vérité)"
+    "settings.source.yml|settings.enc.yml|Configuration globale (Source de vérité)"
 )
 
-DEPENDENCIES=("git" "terraform" "ansible-playbook" "sops" "age-keygen" "j2" "awk" "grep" "sed")
+DEPENDENCIES=("git" "terraform" "ansible-playbook" "sops" "age-keygen" "awk" "grep" "sed")
 
 # ==============================================================================
 # INITIALISATION ET TRAP (Nettoyage)
@@ -107,18 +107,7 @@ generate_secret() {
         return 0
     fi
 
-    # Extraction des variables Jinja2
-    local vars
-    vars=$(grep -o -E '\{\{\s*[a-zA-Z0-9_.]+\s*\}\}' "$template" | sed -E 's/\{\{\s*//; s/\s*\}\}//' | sort -u || true)
-
-    if [ -n "$vars" ]; then
-        echo "$vars" | awk '{print $1 ": \"\""}' > "$TMP_SECRET_FILE"
-    else
-        touch "$TMP_SECRET_FILE"
-    fi
-
-    sops -e "$TMP_SECRET_FILE" > "$secret"
-    > "$TMP_SECRET_FILE" # Vide le fichier temporaire
+    sops -e "$template" > "$secret"
 
     log_warn "-> L'éditeur va s'ouvrir. Remplissez les valeurs."
     read -p "Appuyez sur Entrée..."
