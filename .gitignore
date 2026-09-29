@@ -10,10 +10,12 @@ terraform/tfplan
 *lock*hcl*
 *state*lock*
 remote-backend-init.sh
+versions.tf
 
 # Scripts temporaires
 .setup_env
 *.tmp
+.tmp-vars.yml
 # Secrets
 *.key
 *.pem

@@ -19,12 +19,10 @@ lint-tflint:
 
 # défaut
 TF_LAYER ?=core
-tf: 
+tf: tf-render-templates
 	cd $(TF_DIR)/$(TF_LAYER) && \
 	if [ -f ./remote-backend-init.sh ]; then . ./remote-backend-init.sh; fi && \
-	if [ -f ../terraform.enc.tfvars ]; then \
-		sops --input-type binary --output-type binary exec-file ../terraform.enc.tfvars 'terraform $(ACTION) -var-file="{}"'; \
-	elif [ -f ../terraform.tfvars ]; then \
+	if [ -f ../terraform.tfvars ]; then \
 		terraform $(ACTION) -var-file="../terraform.tfvars"; \
 	else \
 		terraform $(ACTION); \
@@ -56,21 +54,14 @@ deploy-alloy:
 deploy-lxc: 
 	ANSIBLE_STRICT_HOST_KEY_CHECKING=false ansible-playbook ansible/playbooks/bootstrap.yml -i $(ANSIBLE_INVENTORIES)/lxc_inventory.yml $(EXTRA_ARGS)
 
-render-templates:
+tf-render-templates:
 	@echo "[INFO] Génération des fichiers Terraform depuis settings.enc.yml..."
-	@sops -d settings.enc.yml > .tmp-vars.yml
-	@j2 terraform/environments/production/core/versions.tf.j2 .tmp-vars.yml > terraform/environments/production/core/versions.tf
-	@j2 terraform/environments/production/terraform.tfvars.j2 .tmp-vars.yml > terraform/environments/production/terraform.tfvars
-	@cp terraform/environments/production/terraform.tfvars terraform/environments/production/terraform.enc.tfvars
-	@sops --input-type binary --output-type binary -e -i terraform/environments/production/terraform.enc.tfvars
-	@echo "[INFO] terraform.enc.tfvars chiffré et prêt à être commit."
-	@rm -f .tmp-vars.yml
-
-decrypt-templates:
-	@echo "[INFO] Déchiffrement de terraform.enc.tfvars..."
-	@sops -d terraform/environments/production/terraform.enc.tfvars > terraform/environments/production/terraform.tfvars
-	@echo "[INFO] terraform.tfvars généré."
+	@bash -c 'trap "rm -f .tmp-vars.yml" EXIT; \
+	sops -d settings.enc.yml > .tmp-vars.yml; \
+	j2 terraform/environments/production/core/versions.tf.j2 .tmp-vars.yml > terraform/environments/production/core/versions.tf; \
+	j2 terraform/environments/production/terraform.tfvars.j2 .tmp-vars.yml > terraform/environments/production/terraform.tfvars; \
+	echo "[INFO] Variables générées avec succès."'
 
 edit-secrets:
 	EDITOR=vim sops settings.enc.yml
-	$(MAKE) render-templates
+	$(MAKE) tf-render-templates
