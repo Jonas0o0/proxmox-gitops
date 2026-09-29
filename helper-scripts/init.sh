@@ -12,18 +12,11 @@ KEYS_DIR="$HOME/.config/sops/age"
 KEY_FILE="$KEYS_DIR/keys.txt"
 EDITOR="${EDITOR:-sops}"
 
-declare -a SECRETS_TO_GENERATE=(
-    "settings.source.yml|settings.enc.yml|Configuration globale (Source de vérité)"
-)
-
 DEPENDENCIES=("git" "terraform" "ansible-playbook" "sops" "age-keygen" "awk" "grep" "sed")
 
 # ==============================================================================
 # INITIALISATION ET TRAP (Nettoyage)
 # ==============================================================================
-TMP_DIR=$(mktemp -d)
-TMP_SECRET_FILE="$TMP_DIR/secret.enc.yml"
-trap 'rm -rf "$TMP_DIR"' EXIT
 
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -90,30 +83,7 @@ EOF
     fi
 }
 
-generate_secret() {
-    local template="$1"
-    local secret="$2"
-    local desc="$3"
 
-    log_info "Traitement de : $desc"
-
-    if [ -f "$secret" ]; then
-        log_success "-> Déjà configuré. Ignoré."
-        return 0
-    fi
-
-    if [ ! -f "$template" ]; then
-        log_warn "-> Template introuvable ($template). Ignoré."
-        return 0
-    fi
-
-    sops -e "$template" > "$secret"
-
-    log_warn "-> L'éditeur va s'ouvrir. Remplissez les valeurs."
-    read -p "Appuyez sur Entrée..."
-    $EDITOR "$secret"
-    log_success "-> Chiffré et sauvegardé."
-}
 
 # ==============================================================================
 # SCRIPT PRINCIPAL
@@ -129,10 +99,19 @@ git config core.hookspath .githooks 2>/dev/null || log_warn "Git non initialisé
 
 setup_sops_age
 
-for item in "${SECRETS_TO_GENERATE[@]}"; do
-    IFS="|" read -r tpl sec desc <<< "$item"
-    generate_secret "$tpl" "$sec" "$desc"
-done
+if [ ! -f "settings.enc.yml" ]; then
+    log_info "Création de settings.enc.yml à partir de settings.source.yml..."
+    sops -e settings.source.yml > settings.enc.yml
+    log_warn "L'éditeur va s'ouvrir. Remplissez les valeurs."
+    read -p "Appuyez sur Entrée..."
+    $EDITOR settings.enc.yml
+    log_success "Fichier chiffré et sauvegardé."
+else
+    log_info "settings.enc.yml déjà configuré. Ignoré."
+fi
+
+log_info "Génération des templates Terraform..."
+make tf-render-templates || log_warn "Échec de la génération Terraform. Vous pourrez le relancer plus tard."
 
 cat "$(dirname "$0")/next_steps.txt"
 cat "$KEY_FILE"
