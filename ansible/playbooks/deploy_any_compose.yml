@@ -2,24 +2,15 @@
 # trame : on copie les fichiers dans /opt/{service}, on template les fichiers, et selon si ça a changé ou non on redémarre la stack
 - hosts: "{{ host }}"
   become: true
-  vars_files:
-    - ../../settings.yml
   vars:
-    # target_service attendu en argument
+    # target_service attendu en argument
     target_remote_dir: "/opt"
     target_local_dir: "{{ playbook_dir }}/../../services/{{ target_service }}"
 
   tasks:
-    - name: vérifier si le service a des secrets sops
-      ansible.builtin.stat:
-        path: "{{ target_local_dir }}/secrets.enc.yml"
-      register: sops_secret_file
-      delegate_to: localhost
-
-    - name: charger les secrets sops relatifs au service (et uniquement ceux-là)
+    - name: charger les configurations globales et secrets
       community.sops.load_vars:
-        file: "{{ target_local_dir }}/secrets.enc.yml"
-      when: sops_secret_file.stat.exists
+        file: "{{ playbook_dir }}/../../settings.enc.yml"
       no_log: true
 
     # cette tache évite la redondance pour la configuration des sites regardés en générant la configuration à partir des sites de Caddy
@@ -76,10 +67,6 @@
         path: "{{ target_remote_dir }}/{{ target_service }}/{{ item.path }}"
       loop: "{{ query('community.general.filetree', target_local_dir) }}"
       when: item.state == 'file' and item.path.endswith('.j2')
-    - name: supprimer les secrets chiffrés sur le remote (= pas besoin de les laisser là-bas)
-      ansible.builtin.file:
-        state: absent
-        path: "{{ target_remote_dir }}/{{ target_service }}/secrets.enc.yml"
 
     - name: S'assurer que la stack est présente et démarrée
       community.docker.docker_compose_v2:

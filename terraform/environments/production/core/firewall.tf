@@ -7,7 +7,7 @@ resource "proxmox_virtual_environment_cluster_firewall" "cluster" {
 
 
 # Active le backend nftables sur pve1
-resource "proxmox_node_firewall" "pve1" {
+resource "proxmox_node_firewall" "node" {
   node_name         = var.node_name
   enabled           = true
   nftables          = true
@@ -15,14 +15,14 @@ resource "proxmox_node_firewall" "pve1" {
 }
 
 
-resource "proxmox_virtual_environment_firewall_rules" "pve1" {
+resource "proxmox_virtual_environment_firewall_rules" "node" {
   node_name = var.node_name
 
   rule {
     type    = "in"
     action  = "ACCEPT"
     source  = "10.8.0.0/24"
-    dest    = "192.168.1.100/32"
+    dest    = "${var.proxmox_host_ip}/32"
     log     = "info"
     comment = "V vpn wireguard vers ui proxmox"
     enabled = true
@@ -110,7 +110,7 @@ resource "proxmox_virtual_environment_firewall_rules" "pve1" {
   rule {
     type   = "in"
     action = "ACCEPT"
-    source = "192.168.1.0/24"
+    source = var.proxmox_lan_subnet
     dest   = ""
     # dport = destination port
     dport   = "51820"
@@ -138,7 +138,7 @@ resource "proxmox_virtual_environment_firewall_rules" "pve1" {
     type   = "in"
     action = "ACCEPT"
     source = "192.168.10.13/32"
-    dest   = "192.168.1.100/32"
+    dest   = "${var.proxmox_host_ip}/32"
     # dport = destination port
     dport   = "51821"
     proto   = "tcp"
@@ -150,7 +150,7 @@ resource "proxmox_virtual_environment_firewall_rules" "pve1" {
 
   depends_on = [
     proxmox_virtual_environment_cluster_firewall.cluster,
-    proxmox_node_firewall.pve1
+    proxmox_node_firewall.node
   ]
 }
 
@@ -222,6 +222,6 @@ resource "proxmox_virtual_environment_firewall_rules" "caddy_backends" {
 
   depends_on = [
     proxmox_virtual_environment_cluster_firewall.cluster,
-    proxmox_node_firewall.pve1,
+    proxmox_node_firewall.node,
   ]
 }

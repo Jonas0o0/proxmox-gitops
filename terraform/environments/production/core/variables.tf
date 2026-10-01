@@ -30,7 +30,7 @@ variable "node_name" {
 
 
 variable "proxmox_ssh_private_key_path" {
-  description = "Chemin de la cle privee SSH pour le node Proxmox."
+  description = "Chemin vers la clé SSH privée de l'hôte Proxmox (par défaut: ~/.ssh/proxmox_terraform)"
   type        = string
   default     = "~/.ssh/proxmox_terraform"
 }

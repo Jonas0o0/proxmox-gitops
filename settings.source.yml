@@ -1,0 +1,67 @@
+# Domaine principal de l'infrastructure (ex: blavogiez.fr)
+domain: ""
+
+# (Généré automatiquement par le script depuis git remote)
+github_org: ""
+github_repo: ""
+
+# Fuseau horaire du serveur (ex: Europe/Paris)
+timezone: "Europe/Paris"
+
+# Utilisateur par défaut pour les différents services (ex: admin)
+admin_user: "admin"
+
+proxmox:
+  # L'URL est générée dynamiquement à partir de l'IP
+  endpoint: "https://<IP>:8006/api2/json"
+  
+  # Nom d'hôte du noeud Proxmox (ex: pve1 ou homelab)
+  node: "pve"
+  
+  # Stockage Proxmox pour les disques de VM (ex: local-lvm ou local-zfs)
+  storage: "local-lvm"
+  
+  # Stockage pour les sauvegardes et templates (ex: local)
+  backup_storage: "local"
+  
+  # Utilisateur SSH pour se connecter à Proxmox (ex: root)
+  ssh_user: "root"
+  
+  # Nom du fichier de clé SSH pour Proxmox (ex: proxmox_terraform)
+  ssh_key_name: "proxmox_terraform"
+  
+  # Utilisateur et token Proxmox pour Terraform
+  user: "root@pam"
+  realm: "pam"
+  token_id: "terraform"
+  token_secret: ""
+
+monitoring:
+  # Configuration pour pve_exporter et prometheus/loki
+  pve_user: "prometheus@pve"
+  pve_token_name: "prometheus"
+  prometheus_retention: "15d"
+  loki_retention: "15d"
+
+# Configuration SOPS - Tous les secrets des services sont centralisés ici
+secrets:
+  authentik:
+    pg_pass: ""
+    secret_key: ""
+  caddy:
+    cloudflare_api_token: ""
+  cloudflared:
+    tunnel_id: ""
+    credentials_json: ""
+  gh_runner_compose:
+    pat_token: ""
+  komodo:
+    database_password: ""
+    init_admin_password: ""
+    webhook_secret: ""
+    jwt_secret: ""
+  monitoring:
+    grafana_admin_password: ""
+    pve_exporter_token_value: ""
+  proxmox:
+    api_token: ""

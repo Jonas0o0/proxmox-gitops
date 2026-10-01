@@ -1,7 +1,9 @@
 resource "proxmox_download_file" "debian13" {
   node_name    = var.node_name
-  datastore_id = "local"
+  datastore_id = var.backup_storage
   content_type = "import"
+  overwrite    = true
+  overwrite_unmanaged = true
 
   url       = "https://cloud.debian.org/cdimage/cloud/trixie/20260623-2518/debian-13-generic-amd64-20260623-2518.qcow2"
   file_name = "debian-13-genericcloud-amd64.qcow2"
@@ -24,14 +26,14 @@ resource "proxmox_virtual_environment_vm" "debian13" {
   }
 
   disk {
-    datastore_id = "local"
+    datastore_id = var.storage
     file_id      = proxmox_download_file.debian13.id
     interface    = "scsi0"
     discard      = "on"
   }
 
   initialization {
-    datastore_id      = "local"
+    datastore_id      = var.backup_storage
     user_data_file_id = proxmox_virtual_environment_file.cloud_init.id
 
     ip_config {
@@ -50,7 +52,7 @@ resource "proxmox_virtual_environment_vm" "debian13" {
 
 resource "proxmox_virtual_environment_file" "cloud_init" {
   node_name    = var.node_name
-  datastore_id = "local"
+  datastore_id = var.backup_storage
   content_type = "snippets"
 
   source_file {
@@ -65,6 +67,8 @@ resource "proxmox_virtual_environment_file" "cloud_init" {
 module "terraform-backend" {
   source = "../../../modules/vm"
 
+  depends_on = [proxmox_virtual_environment_vm.debian13]
+
   name                = "terraform-backend"
   username            = "admin"
   node_name           = var.node_name
@@ -74,6 +78,7 @@ module "terraform-backend" {
   network_gateway     = "192.168.10.1"
   ssh_public_key_path = var.ssh_public_key_path
   target_datastore_id = var.storage
+  backup_datastore_id = var.backup_storage
 
   cpu       = 1
   # +500Mi pour etre large

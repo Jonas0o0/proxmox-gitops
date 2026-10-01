@@ -42,3 +42,9 @@ variable "storage" {
   description = "disque utilisé par la VM/LXC. Utiliser de préférence du ZFS raid1 avec redondance, et chiffré si possible"
   type        = string
 }
+
+variable "backup_storage" {
+  description = "Stockage utilisé pour les sauvegardes, isos et snippets cloud-init."
+  type        = string
+  default     = "local"
+}
