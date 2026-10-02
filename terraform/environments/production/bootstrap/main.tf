@@ -90,5 +90,7 @@ module "terraform-backend" {
   user_data_raw = templatefile("${path.root}/../../../../services/terraform-backend/cloud-init.yml", {
     hostname       = "terraform-backend"
     ssh_public_key = trimspace(file(pathexpand(var.ssh_public_key_path)))
+    s3_access_key  = var.s3_access_key
+    s3_secret_key  = var.s3_secret_key
   })
 }

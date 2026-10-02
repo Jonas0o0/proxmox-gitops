@@ -65,3 +65,6 @@ secrets:
     pve_exporter_token_value: ""
   proxmox:
     api_token: ""
+  s3:
+    access_key: ""
+    secret_key: ""
