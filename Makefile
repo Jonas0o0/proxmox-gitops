@@ -67,3 +67,8 @@ tf-render-templates:
 edit-secrets:
 	EDITOR=vim sops settings.enc.yml
 	$(MAKE) tf-render-templates
+
+deploy-vpn:
+	@bash -c ' \
+	export PROXMOX_IP=$$(sops -d settings.enc.yml | grep -E "^PROXMOX_HOST_IP:" | awk "{print \$$2}") && \
+	ANSIBLE_STRICT_HOST_KEY_CHECKING=false ansible-playbook ansible/playbooks/deploy_vpn.yml -i "$$PROXMOX_IP," -e "ansible_user=root host=$$PROXMOX_IP target_service=wgeasy" $(EXTRA_ARGS)'

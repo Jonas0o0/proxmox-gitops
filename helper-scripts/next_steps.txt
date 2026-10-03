@@ -11,8 +11,11 @@ Prochaines étapes requises :
 
 2. Déployer l'infrastructure :
    Vous pouvez maintenant déployer votre infrastructure étape par étape :
-   - D'abord le bootstrap Terraform :
+   - D'abord le bootstrap Terraform (réseau et backend S3) :
      make tf-apply TF_LAYER=bootstrap
+   - Déployer le VPN sur l'hôte Proxmox :
+     make deploy-vpn
+   - (Connectez-vous au VPN pour accéder au réseau 192.168.10.x et au backend S3)
    - Ensuite la couche core Terraform :
      make tf-apply
    - Puis provisionner les conteneurs LXC via Ansible :
