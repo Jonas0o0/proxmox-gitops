@@ -11,8 +11,8 @@ terraform {
   backend "s3" {
     bucket                      = "terraform-state"
     key                         = "core/terraform.tfstate"
-    # L'endpoint pointe vers ton nouveau serveur RustFS (via son reverse proxy ou IP)
-    endpoints                   = { s3 = "https://terraform-backend.priv.{{ DOMAIN }}" }
+    # Accès direct à l'IP pour éviter le problème de poule et de l'oeuf avec Caddy/CoreDNS
+    endpoints                   = { s3 = "http://192.168.10.18:9000" }
     region                      = "us-east-1"
     skip_credentials_validation = true
     skip_metadata_api_check     = true
