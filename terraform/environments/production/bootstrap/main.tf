@@ -15,7 +15,6 @@ resource "proxmox_virtual_environment_vm" "debian13" {
   vm_id     = 9000
   template  = true
 
-  started = true
 
   cpu {
     cores = 2
@@ -94,3 +93,7 @@ module "terraform-backend" {
     s3_secret_key  = var.s3_secret_key
   })
 }
+
+
+
+
