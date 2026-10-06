@@ -8,7 +8,7 @@ services:
     container_name: wg-easy
     network_mode: host
     environment:
-      - WG_HOST=192.168.1.100
+      - WG_HOST={{ PROXMOX_HOST_IP }}
       - PORT=51821
       - WG_PORT=51820
       - WG_DEFAULT_DNS=1.1.1.1

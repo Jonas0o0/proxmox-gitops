@@ -31,37 +31,60 @@ jobs:
         # Suppression de continue-on-error et no-fail pour rendre le job bloquant
         uses: hadolint/hadolint-action@v3.3.0
         with:
-          dockerfile: Dockerfile
-          recursive: true
+          dockerfile: services/**/Dockerfile
 
-  # terraform:
-  #   if: ${{ github.event_name == 'workflow_dispatch' }}
-  #   needs: [ static-analysis-checkov, static-analysis-tflint, static-analysis-hadolint ]
-  #   runs-on: self-hosted
-  #   steps:
-  #     - uses: actions/checkout@v4
+
+  terraform-deploy:
+    # S'exécute sur le runner self-hosted (qui a accès au réseau Proxmox/S3)
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/perso' || github.ref == 'refs/heads/48-Remplacement-de-Lynx-par-un-backend-S3-léger-(Rust)'
+    needs: [ static-analysis-checkov, static-analysis-tflint, static-analysis-hadolint ]
+    runs-on: self-hosted
+    env:
+      SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       
-  #     - name: Setup Terraform
-  #       uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
-  #     - name: Terraform Init
-  #       run: terraform -chdir=terraform/environments/production init
+      - name: Install SOPS
+        uses: getsops/setup-sops@v1
+        with:
+          version: v3.8.1
 
-  #     - name: Terraform Validate
-  #       run: terraform -chdir=terraform/environments/production validate
+      - name: Install j2cli
+        run: |
+          pip install j2cli || sudo apt-get install -y python3-j2cli || true
 
-  #     - name: setup du secret terraform tfvars (evite d'avoir trop de variables)
-  #       run: |
-  #         umask 077
-  #         cat > terraform/environments/production/ci.auto.tfvars <<'EOF'
-  #         ${{ secrets.TERRAFORM_TFVARS }}
-  #         EOF
+      - name: Détecter les changements Terraform
+        id: tf_changes
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            terraform/environments/production/bootstrap/**
+            terraform/environments/production/core/**
+            terraform/modules/**
+            settings.enc.yml
 
-  #     # un plan, pas encore de apply ou quoi, ce serait plus complexe et sera géré après, avec backend distant et étude d'autres outils
-  #     - name: Terraform Plan
-  #       run: |
-  #         terraform -chdir=terraform/environments/production plan -no-color
-  #     # dans tous les cas même après ça fonctionnera par un principe de PR, jamais de apply
+      # Applique BOOTSTRAP si son dossier ou des fichiers globaux ont changé
+      - name: Terraform Apply (Bootstrap)
+        if: |
+          github.event_name == 'workflow_dispatch' ||
+          contains(steps.tf_changes.outputs.all_changed_files, 'terraform/environments/production/bootstrap') ||
+          contains(steps.tf_changes.outputs.all_changed_files, 'terraform/modules') ||
+          contains(steps.tf_changes.outputs.all_changed_files, 'settings.enc.yml')
+        run: make tf TF_LAYER=bootstrap ACTION="apply -auto-approve"
+
+      # Applique CORE si son dossier ou des fichiers globaux ont changé
+      - name: Terraform Apply (Core)
+        if: |
+          github.event_name == 'workflow_dispatch' ||
+          contains(steps.tf_changes.outputs.all_changed_files, 'terraform/environments/production/core') ||
+          contains(steps.tf_changes.outputs.all_changed_files, 'terraform/modules') ||
+          contains(steps.tf_changes.outputs.all_changed_files, 'settings.enc.yml')
+        run: make tf TF_LAYER=core ACTION="apply -auto-approve"
 
   # que sur branche perso(fork)
   services-to-deploy:
