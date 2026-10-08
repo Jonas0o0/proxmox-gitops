@@ -1,31 +1,31 @@
 version: '3.8'
 
 services:
-  rustfs:
-    image: rustfs/rustfs:latest
+  minio:
+    image: elestio/minio:latest
     env_file:
       - .env
     environment:
-      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY}
-      RUSTFS_SECRET_KEY: ${S3_SECRET_KEY}
-    command: server /data
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
+    command: server /data --console-address ":9001"
     restart: unless-stopped
     ports:
       - '9000:9000'
       - '9001:9001'
     volumes:
-      - rustfs_data:/data
+      - minio_data:/data
 
   mc-init:
-    image: minio/mc
+    image: elestio/minio:latest
     depends_on:
-      - rustfs
+      - minio
     env_file:
       - .env
     entrypoint: >
       /bin/sh -c "
       sleep 5;
-      mc alias set local http://rustfs:9000 $${S3_ACCESS_KEY} $${S3_SECRET_KEY};
+      mc alias set local http://minio:9000 $${S3_ACCESS_KEY} $${S3_SECRET_KEY};
       mc mb local/terraform-state || true;
       "
 
@@ -45,8 +45,8 @@ services:
       AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY}
       AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY}
       AWS_REGION: us-east-1
-      AWS_ENDPOINTS: http://rustfs:9000
-      AWS_S3_ENDPOINT: http://rustfs:9000
+      AWS_ENDPOINTS: http://minio:9000
+      AWS_S3_ENDPOINT: http://minio:9000
       S3_BUCKET: terraform-state
       S3_FORCE_PATH_STYLE: "true"
     depends_on:
@@ -54,7 +54,7 @@ services:
       - mc-init
 
   db:
-    image: postgres:16.10
+    image: postgres:16
     environment:
       POSTGRES_DB: terraboard
       POSTGRES_USER: root
@@ -66,5 +66,5 @@ services:
 volumes:
   db:
     driver: local
-  rustfs_data:
+  minio_data:
     driver: local

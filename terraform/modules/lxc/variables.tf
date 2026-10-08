@@ -44,7 +44,7 @@ variable "target_datastore_id" {
 
 variable "template_file_id" {
   type    = string
-  default = "local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst"
+  default = "local:vztmpl/debian-13-standard_13.6-1_amd64.tar.zst"
 }
 
 variable "os_type" {

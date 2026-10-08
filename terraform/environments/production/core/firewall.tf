@@ -22,7 +22,7 @@ resource "proxmox_virtual_environment_firewall_rules" "node" {
     type    = "in"
     action  = "ACCEPT"
     source  = "10.8.0.0/24"
-    dest    = "${var.proxmox_host_ip}/32"
+    dest    = "192.168.0.153/32"
     log     = "info"
     comment = "V vpn wireguard vers ui proxmox"
     enabled = true
@@ -110,7 +110,7 @@ resource "proxmox_virtual_environment_firewall_rules" "node" {
   rule {
     type   = "in"
     action = "ACCEPT"
-    source = var.proxmox_lan_subnet
+    source = "192.168.0.0/24"
     dest   = ""
     # dport = destination port
     dport   = "51820"
@@ -138,7 +138,7 @@ resource "proxmox_virtual_environment_firewall_rules" "node" {
     type   = "in"
     action = "ACCEPT"
     source = "192.168.10.13/32"
-    dest   = "${var.proxmox_host_ip}/32"
+    dest   = "192.168.0.153/32"
     # dport = destination port
     dport   = "51821"
     proto   = "tcp"
@@ -195,7 +195,7 @@ locals {
 }
 
 resource "proxmox_virtual_environment_firewall_rules" "caddy_backends" {
-  for_each = merge(local.caddy_backends, local.fork_caddy_backends)
+  for_each = local.caddy_backends
 
   node_name    = var.node_name
   vm_id        = each.value.guest_type == "vm" ? each.value.guest_id : null

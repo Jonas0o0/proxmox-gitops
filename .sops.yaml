@@ -1,4 +1,4 @@
 # https://github.com/getsops/sops
 creation_rules:
   - path_regex: .*\.enc\.(ya?ml|tfvars)$
-    age: "age19d3e2r2ue4c8kk4ghzd0dv0cr6mpnwhakht9rxfp3m9dnda69f0sk4npdx"
+    age: "age1rqvuwj5yy2jk4z323sfvxsw2grt9v3jmt3td6fqqlk7yaau7xf7s8jvcxt"
