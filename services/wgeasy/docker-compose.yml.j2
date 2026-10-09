@@ -8,13 +8,16 @@ services:
     container_name: wg-easy
     network_mode: host
     environment:
-      - WG_HOST={{ PROXMOX_HOST_IP }}
       - PORT=51821
-      - WG_PORT=51820
-      - WG_DEFAULT_DNS=1.1.1.1
+      - INSECURE=true
       - WG_DEVICE=vmbr0
-      - WG_ALLOWED_IPS=10.8.0.0/24, 192.168.10.0/24, 172.16.10.0/24
-      - UI_TRAFFIC_STATS=true
+      # Unattended Setup (v15+)
+      - INIT_ENABLED=true
+      - INIT_HOST={{ PROXMOX_HOST_IP }}
+      - INIT_PORT=51820
+      - INIT_DNS=1.1.1.1
+      - INIT_IPV4_CIDR=10.8.0.0/24
+      - INIT_ALLOWED_IPS=10.8.0.0/24, 192.168.10.0/24, 172.16.10.0/24
     volumes:
       - etc_wireguard:/etc/wireguard
       - /lib/modules:/lib/modules:ro
