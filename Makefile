@@ -24,7 +24,9 @@ tf: tf-render-templates
 	export AWS_ACCESS_KEY_ID=$$(sops -d settings.enc.yml | grep -E "^S3_ACCESS_KEY:" | awk "{print \$$2}") && \
 	export AWS_SECRET_ACCESS_KEY=$$(sops -d settings.enc.yml | grep -E "^S3_SECRET_KEY:" | awk "{print \$$2}") && \
 	cd $(TF_DIR)/$(TF_LAYER) && \
-	if [ -f ../terraform.tfvars ]; then \
+	if [[ "$(ACTION)" == init* ]]; then \
+		terraform $(ACTION); \
+	elif [ -f ../terraform.tfvars ]; then \
 		terraform $(ACTION) -parallelism=3 -var-file="../terraform.tfvars"; \
 	else \
 		terraform $(ACTION) -parallelism=3; \
