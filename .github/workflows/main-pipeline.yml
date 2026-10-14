@@ -1,4 +1,4 @@
-name: "Linters (ce dépôt commun ne déploie rien + runners publics)"
+name: "CI/CD Pipeline (Terraform & Services)"
 
 on:
   push:
@@ -88,7 +88,7 @@ jobs:
 
   # que sur branche perso(fork)
   services-to-deploy:
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/perso'
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/perso' || github.ref == 'refs/heads/main'
     runs-on: self-hosted
     needs: [ static-analysis-checkov, static-analysis-tflint, static-analysis-hadolint ]
     outputs:
@@ -113,7 +113,7 @@ jobs:
           matrix: true
 
   ansible:
-    if: ${{ (github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/perso') && needs.services-to-deploy.outputs.services != '[]' }}
+    if: ${{ (github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/perso' || github.ref == 'refs/heads/main') && needs.services-to-deploy.outputs.services != '[]' }}
     # donc need indirectement Checkov tflint hadolint
     needs: [ services-to-deploy ]
     runs-on: self-hosted
