@@ -50,9 +50,10 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Install SOPS
-        uses: getsops/setup-sops@v1
+        uses: mdgreenwald/mozilla-sops-action@v2
         with:
-          version: v3.8.1
+          version: v3.9.4
+
 
       - name: Install j2cli
         run: |
