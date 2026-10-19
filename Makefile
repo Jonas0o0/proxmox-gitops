@@ -26,10 +26,15 @@ tf: tf-render-templates
 	cd $(TF_DIR)/$(TF_LAYER) && \
 	if [[ "$(ACTION)" == init* ]]; then \
 		terraform $(ACTION); \
-	elif [ -f ../terraform.tfvars ]; then \
-		terraform $(ACTION) -parallelism=3 -var-file="../terraform.tfvars"; \
 	else \
-		terraform $(ACTION) -parallelism=3; \
+		if [ ! -d ".terraform" ]; then \
+			terraform init -input=false; \
+		fi && \
+		if [ -f ../terraform.tfvars ]; then \
+			terraform $(ACTION) -parallelism=3 -var-file="../terraform.tfvars"; \
+		else \
+			terraform $(ACTION) -parallelism=3; \
+		fi; \
 	fi'
 
 tf-init: 
@@ -56,12 +61,15 @@ deploy-alloy:
 	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/playbooks/install_alloy.yml -i $(ANSIBLE_INVENTORY) $(EXTRA_ARGS)
 
 deploy-lxc: 
-	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/playbooks/bootstrap.yml -i $(ANSIBLE_INVENTORIES)/lxc_inventory.yml $(EXTRA_ARGS)
+	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/playbooks/bootstrap.yml -i $(ANSIBLE_INVENTORIES)/lxc_inventory.yml -e "ansible_ssh_private_key_file=~/.ssh/proxmox_terraform bootstrap_ssh_public_key_file=~/.ssh/proxmox_terraform.pub" $(EXTRA_ARGS)
 
 tf-render-templates:
 	@echo "[INFO] Génération des fichiers Terraform depuis settings.enc.yml..."
 	@bash -c 'trap "rm -f .tmp-vars.yml" EXIT; \
 	sops -d settings.enc.yml > .tmp-vars.yml; \
+	if [ -f terraform/environments/production/bootstrap/versions.tf.j2 ]; then \
+		j2 terraform/environments/production/bootstrap/versions.tf.j2 .tmp-vars.yml > terraform/environments/production/bootstrap/versions.tf; \
+	fi; \
 	j2 terraform/environments/production/core/versions.tf.j2 .tmp-vars.yml > terraform/environments/production/core/versions.tf; \
 	j2 terraform/environments/production/terraform.tfvars.j2 .tmp-vars.yml > terraform/environments/production/terraform.tfvars; \
 	echo "[INFO] Variables générées avec succès."'
