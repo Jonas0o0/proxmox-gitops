@@ -60,9 +60,19 @@ jobs:
 
 
 
+      - name: Setup SSH Key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.ANSIBLE_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/proxmox_terraform
+          chmod 600 ~/.ssh/proxmox_terraform
+          ssh-keygen -y -f ~/.ssh/proxmox_terraform > ~/.ssh/proxmox_terraform.pub
+          chmod 644 ~/.ssh/proxmox_terraform.pub
+
       - name: Install j2cli
         run: |
-          pip install j2cli || sudo apt-get install -y python3-j2cli || true
+          which j2 || sudo apt-get install -y j2cli
 
       - name: Détecter les changements Terraform
         id: tf_changes
@@ -92,6 +102,16 @@ jobs:
           contains(steps.tf_changes.outputs.all_changed_files, 'settings.enc.yml')
         run: make tf TF_LAYER=core ACTION="apply -auto-approve"
 
+      # Provisionne les conteneurs LXC (admin + docker) si la couche core ou les modules LXC ont changé
+      - name: Provisionner les conteneurs LXC
+        if: |
+          github.event_name == 'workflow_dispatch' ||
+          contains(steps.tf_changes.outputs.all_changed_files, 'terraform/environments/production/core') ||
+          contains(steps.tf_changes.outputs.all_changed_files, 'terraform/modules/lxc') ||
+          contains(steps.tf_changes.outputs.all_changed_files, 'ansible/playbooks/bootstrap.yml') ||
+          contains(steps.tf_changes.outputs.all_changed_files, 'ansible/inventories/lxc_inventory.yml')
+        run: make deploy-lxc
+
   # que sur branche perso(fork)
   services-to-deploy:
     if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/perso' || github.ref == 'refs/heads/main'
@@ -119,9 +139,14 @@ jobs:
           matrix: true
 
   ansible:
-    if: ${{ (github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/perso' || github.ref == 'refs/heads/main') && needs.services-to-deploy.outputs.services != '[]' }}
-    # donc need indirectement Checkov tflint hadolint
-    needs: [ services-to-deploy ]
+    if: |
+      always() &&
+      (needs.terraform-deploy.result == 'success' || needs.terraform-deploy.result == 'skipped') &&
+      needs.services-to-deploy.result == 'success' &&
+      (github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/perso' || github.ref == 'refs/heads/main') &&
+      needs.services-to-deploy.outputs.services != '[]'
+    # Attend la fin du déploiement terraform et la détection des services
+    needs: [ terraform-deploy, services-to-deploy ]
     runs-on: self-hosted
     strategy:
       fail-fast: false
