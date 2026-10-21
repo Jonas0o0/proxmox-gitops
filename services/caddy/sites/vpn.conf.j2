@@ -1,5 +1,5 @@
 https://vpn.priv.{{ domain }} {
-    @vpn_only remote_ip 10.8.0.0/24    
+    @vpn_only remote_ip 10.8.0.0/24
     handle @vpn_only {
         reverse_proxy 192.168.10.1:51821
     }
@@ -10,7 +10,7 @@ https://vpn.priv.{{ domain }} {
     }
 }
 
-# tester si le rate_limit à 5 se trigger à chaque connexion ou alors à chaque handshake (voir si il est applicable) 
+# tester si le rate_limit à 5 se trigger à chaque connexion ou alors à chaque handshake (voir si il est applicable)
 # pas encore on en public
 # vpn.{{ domain }} {
     # reverse_proxy 192.168.10.1:51820

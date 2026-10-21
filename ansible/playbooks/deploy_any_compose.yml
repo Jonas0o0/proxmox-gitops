@@ -44,7 +44,7 @@
       ansible.builtin.copy:
         src: "{{ target_local_dir }}"
         dest: "{{ target_remote_dir }}"
-        mode: '0644'
+        mode: "u=rwX,g=rX,o=rX"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
       register: target_remote_stack

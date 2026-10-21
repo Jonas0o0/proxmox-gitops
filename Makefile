@@ -24,10 +24,12 @@ tf: tf-render-templates
 	export AWS_ACCESS_KEY_ID=$$(sops -d settings.enc.yml | grep -E "^S3_ACCESS_KEY:" | awk "{print \$$2}") && \
 	export AWS_SECRET_ACCESS_KEY=$$(sops -d settings.enc.yml | grep -E "^S3_SECRET_KEY:" | awk "{print \$$2}") && \
 	cd $(TF_DIR)/$(TF_LAYER) && \
-	if [ -f ../terraform.tfvars ]; then \
-		terraform $(ACTION) -var-file="../terraform.tfvars"; \
-	else \
+	if [[ "$(ACTION)" == init* ]]; then \
 		terraform $(ACTION); \
+	elif [ -f ../terraform.tfvars ]; then \
+		terraform $(ACTION) -parallelism=3 -var-file="../terraform.tfvars"; \
+	else \
+		terraform $(ACTION) -parallelism=3; \
 	fi'
 
 tf-init: 
@@ -43,7 +45,7 @@ tf-destroy:
 	$(MAKE) tf TF_LAYER=$(TF_LAYER) ACTION=destroy
 
 deploy-compose-ci:
-	ANSIBLE_STRICT_HOST_KEY_CHECKING=false ansible-playbook ansible/playbooks/deploy_any_compose.yml -e "host=$(SERVICE) target_service=$(SERVICE)" -i $(ANSIBLE_INVENTORY) $(EXTRA_ARGS)
+	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/playbooks/deploy_any_compose.yml -e "host=$(SERVICE) target_service=$(SERVICE)" -i $(ANSIBLE_INVENTORY) $(EXTRA_ARGS)
 
 # -K en option ansible pcq il va demander à become sudo pour verif les library
 deploy-compose:
@@ -51,10 +53,10 @@ deploy-compose:
 
 
 deploy-alloy:
-	ANSIBLE_STRICT_HOST_KEY_CHECKING=false ansible-playbook ansible/playbooks/install_alloy.yml -i $(ANSIBLE_INVENTORY) $(EXTRA_ARGS)
+	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/playbooks/install_alloy.yml -i $(ANSIBLE_INVENTORY) $(EXTRA_ARGS)
 
 deploy-lxc: 
-	ANSIBLE_STRICT_HOST_KEY_CHECKING=false ansible-playbook ansible/playbooks/bootstrap.yml -i $(ANSIBLE_INVENTORIES)/lxc_inventory.yml $(EXTRA_ARGS)
+	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/playbooks/bootstrap.yml -i $(ANSIBLE_INVENTORIES)/lxc_inventory.yml $(EXTRA_ARGS)
 
 tf-render-templates:
 	@echo "[INFO] Génération des fichiers Terraform depuis settings.enc.yml..."
@@ -68,7 +70,12 @@ edit-secrets:
 	EDITOR=vim sops settings.enc.yml
 	$(MAKE) tf-render-templates
 
+setup-proxmox:
+	@bash -c ' \
+	export PROXMOX_IP=$$(sops -d settings.enc.yml | grep -E "^PROXMOX_HOST_IP:" | awk "{print \$$2}") && \
+	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/playbooks/setup_proxmox_host.yml -i "$$PROXMOX_IP," -e "ansible_user=root host=$$PROXMOX_IP" $(EXTRA_ARGS)'
+
 deploy-vpn:
 	@bash -c ' \
 	export PROXMOX_IP=$$(sops -d settings.enc.yml | grep -E "^PROXMOX_HOST_IP:" | awk "{print \$$2}") && \
-	ANSIBLE_STRICT_HOST_KEY_CHECKING=false ansible-playbook ansible/playbooks/deploy_vpn.yml -i "$$PROXMOX_IP," -e "ansible_user=root host=$$PROXMOX_IP target_service=wgeasy" $(EXTRA_ARGS)'
+	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/playbooks/deploy_vpn.yml -i "$$PROXMOX_IP," -e "ansible_user=root host=$$PROXMOX_IP target_service=wgeasy" $(EXTRA_ARGS)'
