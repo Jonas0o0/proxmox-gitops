@@ -24,8 +24,6 @@
   become: true
   vars:
     bootstrap_ssh_public_key_file: "{{ lookup('env', 'HOME') + '/.ssh/proxmox_terraform.pub' }}"
-
-  vars:
     bootstrap_packages:
       - sudo
       - openssh-server

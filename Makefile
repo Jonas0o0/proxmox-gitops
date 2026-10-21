@@ -65,7 +65,7 @@ deploy-lxc:
 
 tf-render-templates:
 	@echo "[INFO] Génération des fichiers Terraform depuis settings.enc.yml..."
-	@bash -c 'trap "rm -f .tmp-vars.yml" EXIT; \
+	@bash -c 'set -e; trap "rm -f .tmp-vars.yml" EXIT; \
 	sops -d settings.enc.yml > .tmp-vars.yml; \
 	if [ -f terraform/environments/production/bootstrap/versions.tf.j2 ]; then \
 		j2 terraform/environments/production/bootstrap/versions.tf.j2 .tmp-vars.yml > terraform/environments/production/bootstrap/versions.tf; \
