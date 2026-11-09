@@ -31,8 +31,11 @@ services:
 
   terraboard:
     image: camptocamp/terraboard:latest
+    restart: unless-stopped
     ports:
       - "8080:8080"
+    volumes:
+      - ./resolv.conf:/etc/resolv.conf:ro
     env_file:
       - .env
     environment:
