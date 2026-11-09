@@ -60,6 +60,9 @@ tf-render-templates:
 	@echo "[INFO] Génération des fichiers Terraform depuis settings.enc.yml..."
 	@bash -c 'trap "rm -f .tmp-vars.yml" EXIT; \
 	sops -d settings.enc.yml > .tmp-vars.yml; \
+	if [ -f terraform/environments/production/bootstrap/versions.tf.j2 ]; then \
+		j2 terraform/environments/production/bootstrap/versions.tf.j2 .tmp-vars.yml > terraform/environments/production/bootstrap/versions.tf; \
+	fi; \
 	j2 terraform/environments/production/core/versions.tf.j2 .tmp-vars.yml > terraform/environments/production/core/versions.tf; \
 	j2 terraform/environments/production/terraform.tfvars.j2 .tmp-vars.yml > terraform/environments/production/terraform.tfvars; \
 	echo "[INFO] Variables générées avec succès."'
